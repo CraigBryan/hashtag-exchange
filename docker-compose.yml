@@ -13,7 +13,7 @@ services:
         image: node:boron
         build:
             context: ./web 
-            dockerfile: Dockerfile-web
+            dockerfile: Dockerfile
         entrypoint: ./entrypoint.sh 
         volumes:
             - ./web/src:/web/web/src
