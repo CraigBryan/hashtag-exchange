@@ -11,8 +11,9 @@ services:
         entrypoint: mongod --config /etc/mongodb-conf.yaml
     web:
         image: node:boron
-        # build:
-        #     context: ./
-        #     dockerfile: Dockerfile-web
-        entrypoint: bash
-
+        build:
+            context: ./web 
+            dockerfile: Dockerfile-web
+        entrypoint: ./entrypoint.sh 
+        volumes:
+            - ./web/src:/web/web/src
