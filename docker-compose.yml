@@ -17,3 +17,12 @@ services:
         entrypoint: /web/entrypoint.sh 
         volumes:
             - ./web/src:/web/src
+    api:
+        build:
+            context: .
+            dockerfile: api/Dockerfile
+        entrypoint: /api/entrypoint.sh
+        volumes:
+            - ./api/src:/api/src
+        ports:
+            - 3000:3000
