@@ -3,7 +3,6 @@
   "version": "0.1",
   "description": "Explorer web app for the hashtag-exchange app",
   "author": "Craig Bryan",
-  "main": "server.js",
   "scripts": {
     "build-dev": "/node_modules/.bin/webpack --config /web/web/src/webpack.config.js -d --watch --display-error-details",
     "build-prod": "/node_modules/.bin/webpack --config /web/web/src/webpack.config.js -p"
