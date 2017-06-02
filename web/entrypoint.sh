@@ -5,4 +5,3 @@ if [ -z $ENVIRONMENT == "prod" ]; then
 else
     yarn build-dev
 fi
-
