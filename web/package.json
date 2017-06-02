@@ -4,8 +4,8 @@
   "description": "Explorer web app for the hashtag-exchange app",
   "author": "Craig Bryan",
   "scripts": {
-    "build-dev": "/node_modules/.bin/webpack --config /web/web/src/webpack.config.js -d --watch --display-error-details",
-    "build-prod": "/node_modules/.bin/webpack --config /web/web/src/webpack.config.js -p"
+    "build-dev": "./node_modules/.bin/webpack --config ./src/webpack.config.js -d --watch --display-error-details",
+    "build-prod": "./node_modules/.bin/webpack --config ./src/webpack.config.js -p"
   },
   "dependencies": {
     "babel-core": "^6.24.1",
