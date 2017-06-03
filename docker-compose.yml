@@ -6,13 +6,18 @@ services:
         build:
             context: ./
             dockerfile: Dockerfile-mongo
+        entrypoint: mongod --config /etc/mongodb-conf.yaml
+        expose:
+        - "27017"
         volumes:
             - ${LOCAL_DATA_DIR}:/data
-        entrypoint: mongod --config /etc/mongodb-conf.yaml
     web:
         image: node:boron
-        # build:
-        #     context: ./
-        #     dockerfile: Dockerfile-web
         entrypoint: bash
+    he_twitter_miner:
+        build: .\he_twitter_miner
+        volumes:
+        - ${HOST_HE_TWITTER_MINER_SRC_DIR}:/usr/src/app
+        #- D:\Documents\Projects\Git\hashtag-exchange\he_twitter_miner\src:/usr/src/app
+        restart: on-failure
 
