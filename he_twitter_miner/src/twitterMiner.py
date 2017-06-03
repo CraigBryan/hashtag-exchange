@@ -6,19 +6,36 @@ from pymongo import MongoClient
 from pprint import pprint
 import logging
 import json
+import yaml
+
 
 
 #setup logging
 logging.basicConfig(filename='progress.log',level=logging.DEBUG, format='%(asctime)s %(message)s')
 
+#read config file
+config = {}
+with open("config/config.yaml", 'r') as stream:
+    try:
+        logging.info('reading file')
+        config = yaml.load(stream)
+        logging.info('done reading file')
+    except yaml.YAMLError as exc:
+        logging.error(exc)
+        
+config_keys = config["keys"]
 #Variables that contains the user credentials to access Twitter API 
-access_token = <KEY HERE>
-access_token_secret = <KEY HERE>
-consumer_key = <KEY HERE>
-consumer_secret = <KEY HERE>
+access_token = config_keys["TWITTER_ACCESS_TOKEN"]
+access_token_secret = config_keys["TWITTER_TOKEN_SECRET"]
+consumer_key = config_keys["TWITTER_CONSUMER_KEY"]
+consumer_secret = config_keys["TWITTER_CONSUMER_SECRET"]
 
 #create mongodb client connection
-connection_string = 'mongodb://twitterService:Ej9gZVAvyTwxeqlHaIVG@198.199.65.123:27027'
+connection_string = "mongodb://{}:{}@{}:{}".format(
+                    config["users"]["MONGO_DB_TWITTER_USER"],
+                    config["passwords"]["MONGO_DB_TWITTER_PASSWORD"],
+                    config["vms"]["DIGITAL_OCEAN_IP"],
+                    config["vms"]["DIGITAL_OCEAN_MONGO_PORT"])
 logging.info('connecting to database')
 client = MongoClient(connection_string)
 hashtag_exchange_collection = client.hashtagExchange['rawTwitterHashtags']

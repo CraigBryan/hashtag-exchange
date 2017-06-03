@@ -29,6 +29,6 @@ services:
     he_twitter_miner:
         build: .\he_twitter_miner
         volumes:
-        - ${HOST_HE_TWITTER_MINER_SRC_DIR}:/usr/src/app
-        #- D:\Documents\Projects\Git\hashtag-exchange\he_twitter_miner\src:/usr/src/app
+        - ${HOST_HE_TWITTER_MINER_SRC_DIR}\he_twitter_miner\src:/usr/src/app
+        - ${HOST_HE_TWITTER_MINER_SRC_DIR}\config:/usr/src/app/config
         restart: on-failure
