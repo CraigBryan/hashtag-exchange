@@ -11,8 +11,11 @@ import yaml
 
 
 #setup logging
-logging.basicConfig(filename='progress.log',level=logging.DEBUG, format='%(asctime)s %(message)s')
-
+logging.basicConfig(
+    filename='progress.log',
+    level=logging.DEBUG,
+    format='%(asctime)s %(message)s'
+)
 #read config file
 config = {}
 with open("config/config.yaml", 'r') as stream:
@@ -61,7 +64,8 @@ class DataInserter():
             for hashtag in self.extract_data(json_tweet): 
                 hashtag_exchange_collection.insert(hashtag)
                 if self.processed_count% 100 == 0:
-                    logging.info("tweets processed since startup:{}, last hashtag:{}"
+                    logging.info(
+                        "tweets processed since startup:{}, last hashtag:{}"
                         .format(self.processed_count, hashtag))
                 self.processed_count += 1
         elif 'warning' in tweet:
