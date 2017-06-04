@@ -35,4 +35,4 @@ services:
         volumes:
         - ./he_twitter_miner/src:/usr/src/app
         - ./config:/usr/src/app/config
-        restart: on-failure
+#        restart: on-failure

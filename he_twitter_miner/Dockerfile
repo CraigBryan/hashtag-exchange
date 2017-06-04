@@ -10,4 +10,4 @@ WORKDIR /usr/src/app
 RUN pip install pymongo
 RUN pip install pyyaml
 COPY . .
-CMD [ "python", "./twitterMiner.py" ]
+CMD [ "python", "./serverStartup.py" ]

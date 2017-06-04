@@ -1,51 +1,22 @@
 import logging
 import json
 import yaml
-
+import time
+import sys
 from pymongo import MongoClient
 from tweepy import OAuthHandler, Stream
 from tweepy.streaming import StreamListener
 
-# setup logging
-logging.basicConfig(
-    filename='progress.log',
-    level=logging.DEBUG,
-    format='%(asctime)s %(message)s'
-)
 
-# read config file
-config = {}
-with open("config/config.yaml", 'r') as stream:
-    try:
-        logging.info('reading file')
-        config = yaml.load(stream)
-        logging.info('done reading file')
-    except yaml.YAMLError as exc:
-        logging.error(exc)
 
-config_keys = config["keys"]
-# Variables that contains the user credentials to access Twitter API
-access_token = config_keys["TWITTER_ACCESS_TOKEN"]
-access_token_secret = config_keys["TWITTER_TOKEN_SECRET"]
-consumer_key = config_keys["TWITTER_CONSUMER_KEY"]
-consumer_secret = config_keys["TWITTER_CONSUMER_SECRET"]
-
-# create mongodb client connection
-connection_string = "mongodb://{}:{}@{}:{}".format(
-    config["users"]["MONGO_DB_TWITTER_USER"],
-    config["passwords"]["MONGO_DB_TWITTER_PASSWORD"],
-    config["vms"]["DIGITAL_OCEAN_IP"],
-    config["vms"]["DIGITAL_OCEAN_MONGO_PORT"]
-)
-logging.info('connecting to database')
-client = MongoClient(connection_string)
-hashtag_exchange_collection = client.hashtagExchange['rawTwitterHashtags']
-logging.info('connection established')
 
 
 class DataInserter():
     processed_count = 0
 
+    def __init__(self, hashtag_exchange_collection):
+        self.hashtag_exchange_collection = hashtag_exchange_collection
+    
     def extract_data(self, tweet):
         hashtags = tweet['entities']['hashtags']
         if hashtags:
@@ -57,11 +28,11 @@ class DataInserter():
                     "followers_count": tweet["user"]["followers_count"]
                 }
 
-    def insert_data(self, tweet):
-        json_tweet = json.loads(tweet)
-        if 'entities' in tweet:
+    def insert_data(self, json_tweet):
+
+        if 'entities' in json_tweet:
             for hashtag in self.extract_data(json_tweet):
-                hashtag_exchange_collection.insert(hashtag)
+                self.hashtag_exchange_collection.insert(hashtag)
                 if self.processed_count % 100 == 0:
                     logging.info(
                         (
@@ -70,32 +41,113 @@ class DataInserter():
                         ).format(self.processed_count, hashtag)
                     )
                 self.processed_count += 1
-
-        elif 'warning' in tweet:
-            logging.warning(tweet)
-
         return True
-
-    def on_disconnect(self, notice):
-        logging.error(notice)
 
 
 class StdOutListener(StreamListener):
 
+    def __init__(self, hashtag_exchange_collection):
+        self.data_inserter = DataInserter(hashtag_exchange_collection)
+        super(StdOutListener, self).__init__()
+      
+    def on_data(self, raw_data):
+        data = json.loads(raw_data)
+        if 'in_reply_to_status_id' in data:
+            return self.data_inserter.insert_data(data)
+        return super(StdOutListener, self).on_data(raw_data)
+  
+    def keep_alive(self):
+        logging.info("kept alive message received")
+        return
+
+    def on_status(self, status):
+        '''handled on on_data instead'''
+        return
+
+    def on_exception(self, exception):
+        logging.info("exception received notice: {}".format(exception))
+        return False
+
+    def on_event(self, status):
+        logging.info("event received: {}".format(status))
+        """Called when a new event arrives we dont care about these messages"""
+        return
+
+    def on_direct_message(self, status):
+        """Called when a new direct message arrives we dont care about these messages"""
+        return
+
+    def on_friends(self, friends):
+        """Called when a friends list arrives.
+        friends is a list that contains user_id
+        """
+        return
+
+    def on_limit(self, track):
+        """Called when a limitation notice arrives"""
+        return
+
+    def on_error(self, status_code):
+        logging.info("exception received notice: {}".format(status_code))
+        return False
+
+    def on_timeout(self):
+        """Called when stream connection times out"""
+        return
+
+    def on_disconnect(self, notice):
+        logging.info("disconnect received notice: {}".format(notice))
+        return False
+
+    def on_warning(self, notice):
+        logging.info("Warming received notice: {}".format(notice))
+        return
+        
+class TwitterMiner():
+    
     def __init__(self):
-        self.data_inserter = DataInserter()
+        self.configure_logging()
+        self.load_config()
+        logging.info('connecting to database')
+        self.client = MongoClient(self.connection_string)
+        self.hashtag_exchange_collection = self.client.hashtagExchange['rawTwitterHashtags']
+        logging.info('connection established')
+        listener = StdOutListener(self.hashtag_exchange_collection)
+        auth = OAuthHandler(self.consumer_key, self.consumer_secret)
+        auth.set_access_token(self.access_token, self.access_token_secret)
+        self.stream = Stream(auth, listener)
 
-    def on_data(self, data):
-        self.data_inserter.insert_data(data)
-        return True
+    def load_config(self):
+        config = {}
+        with open("config/config.yaml", 'r') as stream:
+            try:
+                logging.info('reading file')
+                config = yaml.load(stream)
+                logging.info('done reading file')
+            except yaml.YAMLError as exc:
+                logging.error(exc)
 
-    def on_error(self, status):
-        logging.info(status)
+        config_keys = config["keys"]
+        # Variables that contains the user credentials to access Twitter API
+        self.access_token = config_keys["TWITTER_ACCESS_TOKEN"]
+        self.access_token_secret = config_keys["TWITTER_TOKEN_SECRET"]
+        self.consumer_key = config_keys["TWITTER_CONSUMER_KEY"]
+        self.consumer_secret = config_keys["TWITTER_CONSUMER_SECRET"]
 
+        # create mongodb client connection
+        self.connection_string = "mongodb://{}:{}@{}:{}".format(
+            config["users"]["MONGO_DB_TWITTER_USER"],
+            config["passwords"]["MONGO_DB_TWITTER_PASSWORD"],
+            config["vms"]["DIGITAL_OCEAN_IP"],
+            config["vms"]["DIGITAL_OCEAN_MONGO_PORT"]
+            )
 
-if __name__ == '__main__':
-    l = StdOutListener()
-    auth = OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
-    stream = Stream(auth, l)
-    stream.sample(stall_warnings=True, languages=['en'])
+    def configure_logging(self):
+        # setup logging
+        logging.basicConfig(
+            filename='progress.log',
+            level=logging.DEBUG,
+            format='%(asctime)s %(message)s'
+            )
+    def start_mining(self):
+            self.stream.sample(stall_warnings=True, languages=['en'])
