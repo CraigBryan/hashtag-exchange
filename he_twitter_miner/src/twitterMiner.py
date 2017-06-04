@@ -58,50 +58,22 @@ class StdOutListener(StreamListener):
   
     def keep_alive(self):
         logging.info("kept alive message received")
-        return
-
-    def on_status(self, status):
-        '''handled on on_data instead'''
-        return
 
     def on_exception(self, exception):
-        logging.info("exception received notice: {}".format(exception))
+        logging.error("exception received notice: {}".format(exception))
         return False
-
-    def on_event(self, status):
-        logging.info("event received: {}".format(status))
-        """Called when a new event arrives we dont care about these messages"""
-        return
-
-    def on_direct_message(self, status):
-        """Called when a new direct message arrives we dont care about these messages"""
-        return
-
-    def on_friends(self, friends):
-        """Called when a friends list arrives.
-        friends is a list that contains user_id
-        """
-        return
-
-    def on_limit(self, track):
-        """Called when a limitation notice arrives"""
-        return
 
     def on_error(self, status_code):
-        logging.info("exception received notice: {}".format(status_code))
+        logging.error("exception received notice: {}".format(status_code))
         return False
 
-    def on_timeout(self):
-        """Called when stream connection times out"""
-        return
 
     def on_disconnect(self, notice):
-        logging.info("disconnect received notice: {}".format(notice))
+        logging.warning("disconnect received notice: {}".format(notice))
         return False
 
     def on_warning(self, notice):
-        logging.info("Warming received notice: {}".format(notice))
-        return
+        logging.warning("Warming received notice: {}".format(notice))
         
 class TwitterMiner():
     
@@ -110,7 +82,9 @@ class TwitterMiner():
         self.load_config()
         logging.info('connecting to database')
         self.client = MongoClient(self.connection_string)
-        self.hashtag_exchange_collection = self.client.hashtagExchange['rawTwitterHashtags']
+        self.hashtag_exchange_collection = self.client.hashtagExchange[
+            'rawTwitterHashtags'
+            ]
         logging.info('connection established')
         listener = StdOutListener(self.hashtag_exchange_collection)
         auth = OAuthHandler(self.consumer_key, self.consumer_secret)
@@ -149,5 +123,7 @@ class TwitterMiner():
             level=logging.DEBUG,
             format='%(asctime)s %(message)s'
             )
+            
     def start_mining(self):
             self.stream.sample(stall_warnings=True, languages=['en'])
+            
