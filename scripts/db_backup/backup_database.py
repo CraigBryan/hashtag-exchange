@@ -12,7 +12,7 @@ from datetime import datetime
 from docopt import docopt
 
 DUMP_LOCATION = '/dump'
-LOG_LOCATION = '/script/log'
+LOG_LOCATION = '/scripts/log'
 
 
 def get_config(config_filename):
@@ -45,8 +45,11 @@ def do_dump(db_path, config):
     mongo_password = config['passwords']['MONGO_DB_ADMIN_PASSWORD']
     mongo_port = config['vms']['DIGITAL_OCEAN_MONGO_PORT']
 
-    command = 'mongodump mongodb://{}:{}@localhost:{} --out={} --gzip'.format(
-        mongo_user, mongo_password, mongo_port, DUMP_LOCATION
+    command = (
+        'mongodump --host=localhost --port={} --username={} --password={}'
+        '--out={} --gzip'
+    ).format(
+        mongo_port, mongo_user, mongo_password, DUMP_LOCATION
     )
 
     # log_file = '{}/mongodump.log'.format(LOG_LOCATION)
