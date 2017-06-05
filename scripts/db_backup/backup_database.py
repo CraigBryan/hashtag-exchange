@@ -49,11 +49,11 @@ def do_dump(db_path, config):
         mongo_user, mongo_password, mongo_port, DUMP_LOCATION
     )
 
-    log_file = '{}/mongodump.log'.format(LOG_LOCATION)
-    error_file = '{}/mongodump.error.log'.format(LOG_LOCATION)
-
+    # log_file = '{}/mongodump.log'.format(LOG_LOCATION)
+    # error_file = '{}/mongodump.error.log'.format(LOG_LOCATION)
+    # TODO capture and log this somewhere
     subprocess.check_output(
-        command, stdout=log_file, stderr=error_file, shell=True
+        command, shell=True
     )
 
     return DUMP_LOCATION
@@ -66,7 +66,7 @@ def main(backup_filename, config_filename):
 
 
 if __name__ == '__main__':
-    args = docopt('__doc__')
+    args = docopt(__doc__)
     db_path = args['<db_path>']
     config_filename = args['<config_filename>']
 

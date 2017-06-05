@@ -1,6 +1,10 @@
-mkdir -p /scripts/log
+FROM python:3
 
-apt-get update
-apt-get install mongodb-org-tools
+RUN mkdir -p /scripts/log
 
-pip install -r requirements.txt
+RUN apt-get update
+RUN apt-get install -y mongodb
+
+COPY ./requirements.txt requirements.txt
+COPY ./backup_database.py backup_database.py
+RUN pip install -r ./requirements.txt

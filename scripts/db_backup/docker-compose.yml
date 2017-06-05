@@ -1,9 +1,11 @@
+version: '3'
+
 services:
   backup:
     build:
-      context: .
+      context: ./
       dockerfile: Dockerfile
-    volume:
+    volumes:
       - ../../config:/scripts/backup
       - ${LOCAL_DATA_DIR}:/data
       - /var/log:/scripts/log
