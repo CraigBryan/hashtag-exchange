@@ -43,13 +43,14 @@ def upload(backup_filename, config):
 def do_dump(db_path, config):
     mongo_user = config['users']['MONGO_DB_ADMIN_USER']
     mongo_password = config['passwords']['MONGO_DB_ADMIN_PASSWORD']
+    mongo_host = config['vms']['DIGITAL_OCEAN_IP']
     mongo_port = config['vms']['DIGITAL_OCEAN_MONGO_PORT']
 
     command = (
-        'mongodump --host=localhost --port={} --username={} --password={}'
-        '--out={} --gzip'
+        'mongodump --host={} --port={} --username={} --password={}'
+        '--out={}'
     ).format(
-        mongo_port, mongo_user, mongo_password, DUMP_LOCATION
+        mongo_host, mongo_port, mongo_user, mongo_password, DUMP_LOCATION
     )
 
     # log_file = '{}/mongodump.log'.format(LOG_LOCATION)
