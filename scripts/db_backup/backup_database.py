@@ -41,14 +41,14 @@ def upload(backup_filename, config):
 
 
 def do_dump(db_path, config):
-    mongo_user = config['users']['MONGO_DB_TWITTER_USER']
-    mongo_password = config['passwords']['MONGO_DB_TWITTER_PASSWORD']
+    mongo_user = config['users']['MONGO_DB_DUMP_USER']
+    mongo_password = config['passwords']['MONGO_DB_DUMP_PASSWORD']
     mongo_host = 'localhost'
     mongo_port = config['vms']['DIGITAL_OCEAN_MONGO_PORT']
 
     command = (
         'mongodump --host={} --port={} --username={} --password={} '
-        '--out={} --db=hashtagExchange'
+        '--out={} --db=hashtagExchange --authenticationDatabase=admin'
     ).format(
         mongo_host, mongo_port, mongo_user, mongo_password, DUMP_LOCATION
     )
