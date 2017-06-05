@@ -2,7 +2,6 @@ version: "3"
 
 services:
     db:
-        image: mongo:3.4
         build:
             context: ./
             dockerfile: Dockerfile-mongo
@@ -17,9 +16,10 @@ services:
         build:
             context: . 
             dockerfile: web/Dockerfile
-        entrypoint: /web/entrypoint.sh 
+        entrypoint: /web/entrypoint.sh
         volumes:
             - ./web/src:/web/src
+            - ../config/:/web/config
     api:
         build:
             context: .
@@ -27,12 +27,13 @@ services:
         entrypoint: /api/entrypoint.sh
         volumes:
             - ./api/src:/api/src
+            - ../config/:/web/config
         ports:
             - 3000:3000
 
     he_twitter_miner:
-        build: .\he_twitter_miner
+        build: ./he_twitter_miner
         volumes:
-        - ./he_twitter_miner/src:/usr/src/app
-        - ./config:/usr/src/app/config
+            - ./he_twitter_miner/src:/usr/src/app
+            - ./config:/usr/src/app/config
         restart: unless-stopped
