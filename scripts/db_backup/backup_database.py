@@ -47,7 +47,7 @@ def do_dump(db_path, config):
     mongo_port = config['vms']['DIGITAL_OCEAN_MONGO_PORT']
 
     command = (
-        'mongodump --host={} --port={} --username={} --password={}'
+        'mongodump --host={} --port={} --username={} --password={} '
         '--out={}'
     ).format(
         mongo_host, mongo_port, mongo_user, mongo_password, DUMP_LOCATION
