@@ -6,12 +6,14 @@ Usage:
 '''
 import boto3
 import subprocess
+import tarfile
 import yaml
 
 from datetime import datetime
 from docopt import docopt
 
 DUMP_LOCATION = '/dump'
+DUMP_FILENAME = 'hashtag-exchange-dump.tar.gz'
 LOG_LOCATION = '/scripts/log'
 
 
@@ -60,13 +62,17 @@ def do_dump(db_path, config):
         command, shell=True
     )
 
-    return DUMP_LOCATION
+    dump_filename = "/DUMP_FILENAME.tar.gz"
+    with tarfile.open(dump_filename, "w:gz") as tar:
+        tar.add(DUMP_LOCATION, arcname="hashagExchangeDump")
+
+    return dump_filename
 
 
 def main(backup_filename, config_filename):
     config = get_config(config_filename)
-    dump_dir = do_dump(backup_filename, config)
-    upload(dump_dir, config)
+    dump_file = do_dump(backup_filename, config)
+    upload(dump_file, config)
 
 
 if __name__ == '__main__':
