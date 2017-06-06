@@ -55,9 +55,6 @@ def do_dump(db_path, config):
         mongo_host, mongo_port, mongo_user, mongo_password, DUMP_LOCATION
     )
 
-    # log_file = '{}/mongodump.log'.format(LOG_LOCATION)
-    # error_file = '{}/mongodump.error.log'.format(LOG_LOCATION)
-    # TODO capture and log this somewhere
     subprocess.check_output(
         command, shell=True
     )
