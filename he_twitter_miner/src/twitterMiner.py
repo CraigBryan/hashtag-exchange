@@ -6,7 +6,8 @@ import sys
 from pymongo import MongoClient
 from tweepy import OAuthHandler, Stream
 from tweepy.streaming import StreamListener
-import datetime
+import dateutil.parser
+
 
 
 
@@ -20,11 +21,11 @@ class DataInserter():
     def extract_data(self, tweet):
         hashtags = tweet['entities']['hashtags']
         if hashtags:
-            for hashtag in hashtags:
-
+            for hashtag in hashtags:               
+                createdDate = dateutil.parser.parse(tweet["created_at"])
                 yield {
                     "hashtag": hashtag["text"],
-                    "created_at": datetime.datetime(tweet["created_at"]),
+                    "created_at": createdDate,
                     "followers_count": tweet["user"]["followers_count"]
                 }
 
