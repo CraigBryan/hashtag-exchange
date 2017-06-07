@@ -1,2 +1,2 @@
 # backup db every 6 hours
-0 0,6,12,18 * * * LOCAL_DATA_DIR=/data/db_data /app/hashtag-exchange/scripts/db_backup/docker-compose build && /app/hashtag-exchange/scripts/db_backup/docker-compose up
+0 0,6,12,18 * * * docker-compose -f /app/hashtag-exchange/scripts/db_backup/docker-compose.yml build && LOCAL_DATA_DIR=/data/db_data docker-compose -f /app/hashtag-exchange/scripts/db_backup/docker-compose.yml up 
