@@ -6,7 +6,7 @@ import sys
 from pymongo import MongoClient
 from tweepy import OAuthHandler, Stream
 from tweepy.streaming import StreamListener
-
+import datetime
 
 
 
@@ -24,7 +24,7 @@ class DataInserter():
 
                 yield {
                     "hashtag": hashtag["text"],
-                    "created_at": tweet["created_at"],
+                    "created_at": datetime.datetime(tweet["created_at"]),
                     "followers_count": tweet["user"]["followers_count"]
                 }
 
@@ -92,29 +92,29 @@ class TwitterMiner():
         self.stream = Stream(auth, listener)
 
     def load_config(self):
-        config = {}
-        with open("config/config.yaml", 'r') as stream:
+        self.config = {}
+        with open("config/config.yaml", 'r') as config_stream:
             try:
                 logging.info('reading file')
-                config = yaml.load(stream)
+                self.config = yaml.load(config_stream)
                 logging.info('done reading file')
             except yaml.YAMLError as exc:
                 logging.error(exc)
 
-        config_keys = config["keys"]
+        config_keys = self.config["keys"]
         # Variables that contains the user credentials to access Twitter API
         self.access_token = config_keys["TWITTER_ACCESS_TOKEN"]
         self.access_token_secret = config_keys["TWITTER_TOKEN_SECRET"]
         self.consumer_key = config_keys["TWITTER_CONSUMER_KEY"]
         self.consumer_secret = config_keys["TWITTER_CONSUMER_SECRET"]
-
         # create mongodb client connection
         self.connection_string = "mongodb://{}:{}@{}:{}".format(
-            config["users"]["MONGO_DB_TWITTER_USER"],
-            config["passwords"]["MONGO_DB_TWITTER_PASSWORD"],
-            config["vms"]["DIGITAL_OCEAN_IP"],
-            config["vms"]["DIGITAL_OCEAN_MONGO_PORT"]
+            self.config["users"]["MONGO_DB_TWITTER_USER"],
+            self.config["passwords"]["MONGO_DB_TWITTER_PASSWORD"],
+            self.config["vms"]["DIGITAL_OCEAN_IP"],
+            self.config["vms"]["DIGITAL_OCEAN_MONGO_PORT"]
             )
+        logging.info("CONNECTION STRING:{}".format(self.connection_string))
 
     def configure_logging(self):
         # setup logging
@@ -125,5 +125,5 @@ class TwitterMiner():
             )
             
     def start_mining(self):
-            self.stream.sample(stall_warnings=True, languages=['en'])
+        self.stream.sample(stall_warnings=True, languages=['en'])
             
