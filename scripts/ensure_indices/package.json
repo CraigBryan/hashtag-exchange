@@ -1,0 +1,13 @@
+{
+  "name": "hashtag-exchange-ensure-indices",
+  "version": "0.1",
+  "description": "Ensures the database for hashtag-exchange",
+  "author": "Craig Bryan",
+  "scripts": {
+    "ensure-indices": "node ./ensure-indices.js"
+  },
+  "dependencies": {
+    "js-yaml": "^3.8.4",
+    "mongodb": "^2.2.28"
+  }
+}
