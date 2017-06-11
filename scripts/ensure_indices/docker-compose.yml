@@ -8,4 +8,4 @@ services:
     network_mode: "host"
     volumes:
       - ../../config:/scripts/ensure-indices
-      - /var/log:/scripts/log
+      - ${HOST_LOG_DIR}:/scripts/log
