@@ -10,7 +10,7 @@ RUN apt-get update
 RUN apt-get install yarn
 
 COPY ./package.json ./package.json
-COPY ./ensure_indices.js ./ensure-indices.js
+COPY ./ensure-indices.js ./ensure-indices.js
 
 RUN yarn install
 ENTRYPOINT yarn ensure-indices 
