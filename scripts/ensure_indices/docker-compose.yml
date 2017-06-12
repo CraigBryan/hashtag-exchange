@@ -6,8 +6,6 @@ services:
       context: ./
       dockerfile: Dockerfile
     network_mode: "host"
-    environment:
-      - CONFIG_FILE_PATH=/scripts/ensure-indices/config.yaml
     volumes:
-      - ../../config:/scripts/ensure-indices
+      - ${HOST_CONFIG_DIR}:/scripts/ensure-indices
       - ${HOST_LOG_DIR}:/scripts/log

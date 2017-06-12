@@ -1,7 +1,5 @@
 /*
 This script can use the following optional environment variables:
-CONFIG_FILE_PATH - the path for the config file
-                   default: /scripts/ensure-indices/config.yaml
 MONGO_HOST - the host address of the mongo server
              default: localhost
 MONGO_PORT - the port of the mongo server
@@ -13,8 +11,7 @@ var fs = require('fs');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 
-var CONFIG_PATH = process.env.CONFIG_FILE_PATH ||
-                  '/scripts/ensure-indices/config.yaml';
+var CONFIG_PATH = '/scripts/ensure-indices/config.yaml';
 var indexErrors = [];
 
 function getDb(config_path) {
