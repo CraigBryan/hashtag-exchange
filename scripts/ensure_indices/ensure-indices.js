@@ -35,7 +35,8 @@ function getDb(config_path) {
     process.exit(1);
   }
 
-  let mongoUrl = `mongodb://${}:${}@${mongoHost}:${mongoPort}/${dbName}`;
+  let mongoUrl = `mongodb://${mongoUser}:${mongoPass}@ ` + 
+                 `${mongoHost}:${mongoPort}/${dbName}`;
   let connection = null;
 
   MongoClient.connect(mongoUrl, (err, conn) => {
