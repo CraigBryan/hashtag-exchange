@@ -40,15 +40,21 @@ function runIndexing(config_path, indexingFunctions) {
 
   MongoClient.connect(mongoUrl, (err, conn) => {
     for (func in indexingFunctions) {
-      err = func(conn);
       if (err != null) {
-       indexErrors.push(err);
+        console.log("Error connecting to database");
+        process.exit(1);
+      }
+      indexingError = func(conn);
+      if (indexingError != null) {
+       indexErrors.push(indexingError);
       }
     }
   });
 
-  console.log(`Successfully connected to ${mongoUrl}`);
-  return indexErrors;
+  if (indexErrors.length != 0) {
+    console.log(`Errors during indexing: ${indexErrors}`);
+    process.exit(1);
+  }
 };
 
 // Ensures there are indices on the rawTwitterHashtags collection 
@@ -76,16 +82,8 @@ var ensureRawTwitterData = function(db) {
 
 // Add more indexing functions here
 
-let indexingFunction = [
+let indexingFunctions = [
   ensureRawTwitterData,
   // Add the indexing functions here
 ]
-let indexErrors = runIndexing(CONFIG_PATH, indexingFunction);
-
-if (indexErrors.length != 0) {
-  console.log('Errors occurred during ensureIndex');
-  console.log(indexErrors);
-  process.exit(1);
-};
-
-console.log('Successfully ensured indices');
+runIndexing(CONFIG_PATH, indexingFunctions);
