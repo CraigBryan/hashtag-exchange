@@ -12,14 +12,14 @@ var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 
 var CONFIG_PATH = '/scripts/ensure-indices/config.yaml';
-var indexErrors = [];
 
-function getDb(config_path) {
+function runIndexing(config_path, indexingFunctions) {
   let mongoHost = null;
   let mongoPort = null;
   let mongoUser = null;
   let mongoPass = null;
   let dbName = null;
+  let indexErrors = [];
 
   try {
     let config = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'));
@@ -35,17 +35,20 @@ function getDb(config_path) {
     process.exit(1);
   }
 
-  let mongoUrl = `mongodb://${mongoUser}:${mongoPass}@ ` + 
+  let mongoUrl = `mongodb://${mongoUser}:${mongoPass}@` +
                  `${mongoHost}:${mongoPort}/${dbName}`;
-  let connection = null;
 
   MongoClient.connect(mongoUrl, (err, conn) => {
-    assert.equal(err, null);
-    connection = conn;
+    for (func in indexingFunctions) {
+      err = func(db);
+      if (err != null) {
+       indexErrors.push(err);
+      }
+    }
   });
 
   console.log(`Successfully connected to ${mongoUrl}`);
-  return connection;
+  return indexErrors;
 };
 
 // Ensures there are indices on the rawTwitterHashtags collection 
@@ -60,21 +63,24 @@ function ensureRawTwitterData(db) {
     {'expireAfterSeconds': 31 * 24 * 60 * 60}, // 31 days
     function(err, indexName) {
       if (err != null) {
-        indexErrors.push(err);
+        return err;
       } else {
         console.log('"createdOn" index exists');
       }
-    };
+    }
   );
 
   console.log('Finished indexing the "rawTwitterHashtags" collection');
+  return null;
 };
 
-// Add more collection indexing functions here
+// Add more indexing functions here
 
-var db = getDb(CONFIG_PATH);
-ensureRawTwitterData(db);
-// call more collection indexing functions here
+let indexingFunction = [
+  ensureRawTwitterData,
+  // Add the indexing functions here
+]
+let indexErrors = runIndexing(CONFIG_PATH, indexingFunction);
 
 if (indexErrors.length() != 0) {
   console.log('Errors occurred during ensureIndex');
