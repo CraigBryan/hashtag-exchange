@@ -82,7 +82,7 @@ let indexingFunction = [
 ]
 let indexErrors = runIndexing(CONFIG_PATH, indexingFunction);
 
-if (indexErrors.length() != 0) {
+if (indexErrors.length != 0) {
   console.log('Errors occurred during ensureIndex');
   console.log(indexErrors);
   process.exit(1);
