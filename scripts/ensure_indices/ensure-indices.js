@@ -40,7 +40,7 @@ function runIndexing(config_path, indexingFunctions) {
 
   MongoClient.connect(mongoUrl, (err, conn) => {
     for (func in indexingFunctions) {
-      err = func(db);
+      err = func(conn);
       if (err != null) {
        indexErrors.push(err);
       }
