@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  ensure-indices:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    network_mode: "host"
+    volumes:
+      - ${HOST_CONFIG_DIR}:/scripts/ensure-indices
+      - ${HOST_LOG_DIR}:/scripts/log

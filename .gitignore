@@ -4,3 +4,4 @@ config.yaml
 *.orig
 /he_twitter_miner/src/*__pycache__*
 *.log
+node_modules/
