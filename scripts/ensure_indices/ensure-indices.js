@@ -52,7 +52,7 @@ function runIndexing(config_path, indexingFunctions) {
 };
 
 // Ensures there are indices on the rawTwitterHashtags collection 
-function ensureRawTwitterData(db) {
+var ensureRawTwitterData = function(db) {
   console.log('Indexing the "rawTwitterHashtags" collection');
 
   console.log('Ensuring index on the "createdOn" field');
