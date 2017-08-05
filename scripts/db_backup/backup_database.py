@@ -59,7 +59,7 @@ def do_dump(db_path, config):
         command, shell=True
     )
 
-    dump_filename = "/DUMP_FILENAME.tar.gz"
+    dump_filename = "{}/{}".format(DUMP_LOCATION, DUMP_FILENAME)
     with tarfile.open(dump_filename, "w:gz") as tar:
         tar.add(DUMP_LOCATION, arcname="hashagExchangeDump")
 
